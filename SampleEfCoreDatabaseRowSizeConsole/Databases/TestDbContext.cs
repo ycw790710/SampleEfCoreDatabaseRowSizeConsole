@@ -1,7 +1,7 @@
-﻿using SampleEfCoreDatabaseRowSizeConsole.Databases.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.Extensions.Logging;
+using SampleEfCoreDatabaseRowSizeConsole.Databases.Models;
 using System.Diagnostics;
 
 namespace SampleEfCoreDatabaseRowSizeConsole.Databases;
@@ -22,50 +22,41 @@ public class TestDbContext : DbContext
             (str) => Debug.WriteLine(str), new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Trace);
     }
 
-    public int NpgsqlPgColumnSize_Int(int column)
-    {
-        throw new NotImplementedException();
-    }
-    public int NpgsqlPgColumnSize_String(string column)
-    {
-        throw new NotImplementedException();
-    }
-    public int NpgsqlPgColumnSize_Bytes(byte[] column)
-    {
-        throw new NotImplementedException();
-    }
+    public int NpgsqlPgColumnSize(int column) => throw new NotImplementedException();
+    public int NpgsqlPgColumnSize(string column) => throw new NotImplementedException();
+    public int NpgsqlPgColumnSize(byte[] column) => throw new NotImplementedException();
+    public int NpgsqlPgColumnSize(long column) => throw new NotImplementedException();
+    public int NpgsqlPgColumnSize(decimal column) => throw new NotImplementedException();
+    public int NpgsqlPgColumnSize(float column) => throw new NotImplementedException();
+    public int NpgsqlPgColumnSize(DateTime column) => throw new NotImplementedException();
+    public int NpgsqlPgColumnSize(bool column) => throw new NotImplementedException();
+    public int NpgsqlPgColumnSize(byte column) => throw new NotImplementedException();
 
-    public long SqlServerDATALENGTH_Int(int column)
-    {
-        throw new NotImplementedException();
-    }
-    public long SqlServerDATALENGTH_String(string column)
-    {
-        throw new NotImplementedException();
-    }
-    public long SqlServerDATALENGTH_Bytes(byte[] column)
-    {
-        throw new NotImplementedException();
-    }
+    public long SqlServerDATALENGTH(int column) => throw new NotImplementedException();
+    public long SqlServerDATALENGTH(string column) => throw new NotImplementedException();
+    public long SqlServerDATALENGTH(byte[] column) => throw new NotImplementedException();
+    public long SqlServerDATALENGTH(long column) => throw new NotImplementedException();
+    public long SqlServerDATALENGTH(decimal column) => throw new NotImplementedException();
+    public long SqlServerDATALENGTH(float column) => throw new NotImplementedException();
+    public long SqlServerDATALENGTH(DateTime column) => throw new NotImplementedException();
+    public long SqlServerDATALENGTH(bool column) => throw new NotImplementedException();
+    public long SqlServerDATALENGTH(byte column) => throw new NotImplementedException();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasDbFunction(GetType().GetMethod(nameof(NpgsqlPgColumnSize_Int)))
-           .HasTranslation(TranslationNpgsqlPgColumnSize());
-        modelBuilder.HasDbFunction(GetType().GetMethod(nameof(NpgsqlPgColumnSize_String)))
-           .HasTranslation(TranslationNpgsqlPgColumnSize());
-        modelBuilder.HasDbFunction(GetType().GetMethod(nameof(NpgsqlPgColumnSize_Bytes)))
-           .HasTranslation(TranslationNpgsqlPgColumnSize());
+        foreach (var method in GetType().GetMethods().Where(n => n.Name == nameof(NpgsqlPgColumnSize)))
+        {
+            modelBuilder.HasDbFunction(method)
+               .HasTranslation(TranslationNpgsqlPgColumnSize());
+        }
 
-        modelBuilder.HasDbFunction(GetType().GetMethod(nameof(SqlServerDATALENGTH_Int)))
-           .HasTranslation(TranslationSqlServerDATALENGTH());
-        modelBuilder.HasDbFunction(GetType().GetMethod(nameof(SqlServerDATALENGTH_String)))
-           .HasTranslation(TranslationSqlServerDATALENGTH());
-        modelBuilder.HasDbFunction(GetType().GetMethod(nameof(SqlServerDATALENGTH_Bytes)))
-           .HasTranslation(TranslationSqlServerDATALENGTH());
+        foreach (var method in GetType().GetMethods().Where(n => n.Name == nameof(SqlServerDATALENGTH)))
+        {
+            modelBuilder.HasDbFunction(method)
+               .HasTranslation(TranslationSqlServerDATALENGTH());
+        }
 
         SetModels(modelBuilder);
-
     }
 
     private static Func<IReadOnlyList<SqlExpression>, SqlExpression> TranslationNpgsqlPgColumnSize()
@@ -77,7 +68,7 @@ public class TestDbContext : DbContext
                 throw new ArgumentException($"{functionName} function expects one argument");
 
             var firstArg = args.First();
-            ColumnExpression columnExpression = firstArg as ColumnExpression;
+            ColumnExpression columnExpression = firstArg as ColumnExpression;            
             if (columnExpression == null)
                 columnExpression = (firstArg as SqlUnaryExpression)?.Operand as ColumnExpression;
             if (columnExpression == null)

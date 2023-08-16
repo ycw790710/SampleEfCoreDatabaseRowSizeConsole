@@ -77,17 +77,17 @@ namespace SampleEfCoreDatabaseRowSizeConsole
 
                     var userRowSize2 = dbContext.Users
                         .Where(n => n.Id == user.Id)
-                        .Sum(n => dbContext.NpgsqlPgColumnSize_Int(n.Id));
+                        .Sum(n => dbContext.NpgsqlPgColumnSize(n.Id));
                     var fileStoreRowSize2 = dbContext.FileStores
                         .Where(n => n.UserId == user.Id)
-                        .Sum(n => dbContext.NpgsqlPgColumnSize_Int(n.Id) +
-                        dbContext.NpgsqlPgColumnSize_Int(n.UserId) +
-                        dbContext.NpgsqlPgColumnSize_Bytes(n._data));
+                        .Sum(n => dbContext.NpgsqlPgColumnSize(n.Id) +
+                        dbContext.NpgsqlPgColumnSize(n.UserId) +
+                        dbContext.NpgsqlPgColumnSize(n._data));
                     var userNotificationRowSize2 = dbContext.UserNotifications
                         .Where(n => n.UserId == user.Id)
-                        .Sum(n => dbContext.NpgsqlPgColumnSize_Int(n.Id) +
-                        dbContext.NpgsqlPgColumnSize_Int(n.UserId) +
-                        dbContext.NpgsqlPgColumnSize_String(n.Message));
+                        .Sum(n => dbContext.NpgsqlPgColumnSize(n.Id) +
+                        dbContext.NpgsqlPgColumnSize(n.UserId) +
+                        dbContext.NpgsqlPgColumnSize(n.Message));
 
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine("User-defined function mapping");
@@ -144,17 +144,17 @@ namespace SampleEfCoreDatabaseRowSizeConsole
 
                     var userRowSize2 = dbContext.Users
                         .Where(n => n.Id == user.Id)
-                        .Sum(n => dbContext.SqlServerDATALENGTH_Int(n.Id));
+                        .Sum(n => dbContext.SqlServerDATALENGTH(n.Id));
                     var fileStoreRowSize2 = dbContext.FileStores
                         .Where(n => n.UserId == user.Id)
-                        .Sum(n => dbContext.SqlServerDATALENGTH_Int(n.Id) +
-                        dbContext.SqlServerDATALENGTH_Int(n.UserId) +
-                        dbContext.SqlServerDATALENGTH_Bytes(n._data));
+                        .Sum(n => dbContext.SqlServerDATALENGTH(n.Id) +
+                        dbContext.SqlServerDATALENGTH(n.UserId) +
+                        dbContext.SqlServerDATALENGTH(n._data));
                     var userNotificationRowSize2 = dbContext.UserNotifications
                         .Where(n => n.UserId == user.Id)
-                        .Sum(n => dbContext.SqlServerDATALENGTH_Int(n.Id) +
-                        dbContext.SqlServerDATALENGTH_Int(n.UserId) +
-                        dbContext.SqlServerDATALENGTH_String(n.Message));
+                        .Sum(n => dbContext.SqlServerDATALENGTH(n.Id) +
+                        dbContext.SqlServerDATALENGTH(n.UserId) +
+                        dbContext.SqlServerDATALENGTH(n.Message));
 
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine("User-defined function mapping");
