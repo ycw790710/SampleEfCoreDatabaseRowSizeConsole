@@ -1,7 +1,8 @@
 ﻿using Dapper;
+using Microsoft.EntityFrameworkCore;
 using SampleEfCoreDatabaseRowSizeConsole.Databases;
 using SampleEfCoreDatabaseRowSizeConsole.Databases.Models;
-using Microsoft.EntityFrameworkCore;
+using SampleEfCoreDatabaseRowSizeConsole.Databases.SqlFuncHelpers;
 using static Dapper.SqlMapper;
 
 namespace SampleEfCoreDatabaseRowSizeConsole
@@ -77,17 +78,17 @@ namespace SampleEfCoreDatabaseRowSizeConsole
 
                     var userRowSize2 = dbContext.Users
                         .Where(n => n.Id == user.Id)
-                        .Sum(n => dbContext.NpgsqlPgColumnSize(n.Id));
+                        .Sum(n => SqlFuncHelper.ColumnDataSize(n.Id));
                     var fileStoreRowSize2 = dbContext.FileStores
                         .Where(n => n.UserId == user.Id)
-                        .Sum(n => dbContext.NpgsqlPgColumnSize(n.Id) +
-                        dbContext.NpgsqlPgColumnSize(n.UserId) +
-                        dbContext.NpgsqlPgColumnSize(n._data));
+                        .Sum(n => SqlFuncHelper.ColumnDataSize(n.Id) +
+                        SqlFuncHelper.ColumnDataSize(n.UserId) +
+                        SqlFuncHelper.ColumnDataSize(n._data));
                     var userNotificationRowSize2 = dbContext.UserNotifications
                         .Where(n => n.UserId == user.Id)
-                        .Sum(n => dbContext.NpgsqlPgColumnSize(n.Id) +
-                        dbContext.NpgsqlPgColumnSize(n.UserId) +
-                        dbContext.NpgsqlPgColumnSize(n.Message));
+                        .Sum(n => SqlFuncHelper.ColumnDataSize(n.Id) +
+                        SqlFuncHelper.ColumnDataSize(n.UserId) +
+                        SqlFuncHelper.ColumnDataSize(n.Message));
 
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine("User-defined function mapping");
@@ -144,17 +145,17 @@ namespace SampleEfCoreDatabaseRowSizeConsole
 
                     var userRowSize2 = dbContext.Users
                         .Where(n => n.Id == user.Id)
-                        .Sum(n => dbContext.SqlServerDATALENGTH(n.Id));
+                        .Sum(n => SqlFuncHelper.ColumnDataSize(n.Id));
                     var fileStoreRowSize2 = dbContext.FileStores
                         .Where(n => n.UserId == user.Id)
-                        .Sum(n => dbContext.SqlServerDATALENGTH(n.Id) +
-                        dbContext.SqlServerDATALENGTH(n.UserId) +
-                        dbContext.SqlServerDATALENGTH(n._data));
+                        .Sum(n => SqlFuncHelper.ColumnDataSize(n.Id) +
+                        SqlFuncHelper.ColumnDataSize(n.UserId) +
+                        SqlFuncHelper.ColumnDataSize(n._data));
                     var userNotificationRowSize2 = dbContext.UserNotifications
                         .Where(n => n.UserId == user.Id)
-                        .Sum(n => dbContext.SqlServerDATALENGTH(n.Id) +
-                        dbContext.SqlServerDATALENGTH(n.UserId) +
-                        dbContext.SqlServerDATALENGTH(n.Message));
+                        .Sum(n => SqlFuncHelper.ColumnDataSize(n.Id) +
+                        SqlFuncHelper.ColumnDataSize(n.UserId) +
+                        SqlFuncHelper.ColumnDataSize(n.Message));
 
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine("User-defined function mapping");
@@ -176,7 +177,7 @@ namespace SampleEfCoreDatabaseRowSizeConsole
             Console.WriteLine();
         }
 
-        static string MssqlGetSize<T>(DbContext dbContext, 
+        static string MssqlGetSize<T>(DbContext dbContext,
             string where)
         {
             var type = typeof(T);
