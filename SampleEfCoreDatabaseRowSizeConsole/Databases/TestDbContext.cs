@@ -22,12 +22,13 @@ public class TestDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.LogTo(
-            (str) => Debug.WriteLine(str), new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Trace);
+            (str) => Debug.WriteLine(str), new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        sqlFuncHelperBuilder.SetModelBuilder(modelBuilder, Database.ProviderName);
+        sqlFuncHelperBuilder.SetModelBuilder(modelBuilder, 
+            Database.ProviderName ?? throw new Exception("Empty ProviderName"));
         SetModels(modelBuilder);
     }
 

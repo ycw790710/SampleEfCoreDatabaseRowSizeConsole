@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SampleEfCoreDatabaseRowSizeConsole.Databases;
 using SampleEfCoreDatabaseRowSizeConsole.Databases.Models;
 using SampleEfCoreDatabaseRowSizeConsole.Databases.SqlFuncHelpers;
+using System.Diagnostics;
 using static Dapper.SqlMapper;
 
 namespace SampleEfCoreDatabaseRowSizeConsole
@@ -200,6 +201,8 @@ namespace SampleEfCoreDatabaseRowSizeConsole
         {
             var type = typeof(T);
             var entityType = dbContext.Model.FindEntityType(type);
+            if (entityType == null)
+                throw new Exception($"not find Entity:{type} in dbContext");
             var schema = entityType.GetSchema();
             var tableName = entityType.GetTableName();
             var columnNames = entityType.GetProperties().Select(n => n.GetColumnName()).ToArray();
@@ -211,6 +214,7 @@ namespace SampleEfCoreDatabaseRowSizeConsole
 SELECT {string.Join('+', columnNames.Select(n => $"SUM(DATALENGTH({alias}.{n}))"))} AS N'TotalSize'
 FROM {fullTableNameStr} AS {alias}
 {where}";
+            Debug.WriteLine($"command:{selectFrom}");
             return selectFrom;
         }
 
@@ -219,6 +223,8 @@ FROM {fullTableNameStr} AS {alias}
         {
             var type = typeof(T);
             var entityType = dbContext.Model.FindEntityType(type);
+            if (entityType == null)
+                throw new Exception($"not find Entity:{type} in dbContext");
             var schema = entityType.GetSchema();
             var tableName = entityType.GetTableName();
             var columnNames = entityType.GetProperties().Select(n => n.GetColumnName()).ToArray();
@@ -230,6 +236,7 @@ FROM {fullTableNameStr} AS {alias}
 SELECT {string.Join('+', columnNames.Select(n => $@"SUM(pg_column_size({alias}.""{n}""))"))} AS ""TotalSize""
 FROM {fullTableNameStr} AS {alias}
 {where}";
+            Debug.WriteLine($"command:{selectFrom}");
             return selectFrom;
         }
 

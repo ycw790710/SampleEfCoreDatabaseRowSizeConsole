@@ -4,7 +4,7 @@ namespace SampleEfCoreDatabaseRowSizeConsole.Databases.SqlFuncHelpers;
 
 public class SqlFuncHelperBuilder
 {
-    private ISqlFuncHelperTranslations sqlFuncHelperTranslations;
+    private ISqlFuncHelperTranslations sqlFuncHelperTranslations = null!;
 
     public void SetModelBuilder(ModelBuilder modelBuilder, string providerName)
     {

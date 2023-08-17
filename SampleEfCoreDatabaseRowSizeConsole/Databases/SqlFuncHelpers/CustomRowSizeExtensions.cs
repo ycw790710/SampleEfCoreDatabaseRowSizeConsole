@@ -7,15 +7,13 @@ public static class CustomRowSizeExtensions
 {
     public static long GetCustomRowSize<TEntity>(this IQueryable<TEntity> query, DbContext dbContext)
     {
-        Expression<Func<TEntity, long>> lambda = GetTotalColumnDataSizeExpression<TEntity>(dbContext);
-
+        var lambda = GetTotalColumnDataSizeExpression<TEntity>(dbContext);
         return query.Sum(lambda);
     }
 
     public static Task<long> GetCustomRowSizeAsync<TEntity>(this IQueryable<TEntity> query, DbContext dbContext)
     {
-        Expression<Func<TEntity, long>> lambda = GetTotalColumnDataSizeExpression<TEntity>(dbContext);
-
+        var lambda = GetTotalColumnDataSizeExpression<TEntity>(dbContext);
         return query.SumAsync(lambda);
     }
 
@@ -24,6 +22,8 @@ public static class CustomRowSizeExtensions
         var parameter = Expression.Parameter(typeof(TEntity), "n");
 
         var entityType = dbContext.Model.FindEntityType(typeof(TEntity));
+        if (entityType == null)
+            throw new Exception($"not find Entity:{typeof(TEntity)} in dbContext");
         var properties = entityType.GetProperties();
 
         var sumExpressions = new List<Expression>();
@@ -43,7 +43,6 @@ public static class CustomRowSizeExtensions
         }
 
         var totalExpression = sumExpressions.Aggregate(
-            (Expression)null,
             (current, expression) => current == null ? expression : Expression.Add(current, expression));
 
         var lambda = Expression.Lambda<Func<TEntity, long>>(totalExpression, parameter);
