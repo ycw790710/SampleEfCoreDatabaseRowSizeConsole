@@ -60,43 +60,27 @@ namespace SampleEfCoreDatabaseRowSizeConsole
 
                     var dbConnection = dbContext.Database.GetDbConnection();
 
-                    var userRowSize = dbConnection.QuerySingle<int>(
-                        NpgsqlGetSize<User>(dbContext, $@"WHERE t.""Id"" = {user.Id}"));
-                    var fileStoreRowSize = dbConnection.QuerySingle<int>(
-                        NpgsqlGetSize<FileStore>(dbContext, $@"WHERE t.""UserId"" = {user.Id}"));
-                    var userNotificationRowSize = dbConnection.QuerySingle<int>(
-                        NpgsqlGetSize<UserNotification>(dbContext, $@"WHERE t.""UserId"" = {user.Id}"));
 
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine("Custom Command");
                     Console.ResetColor();
 
+                    var userRowSize = dbConnection.QuerySingle<int>(
+                        NpgsqlGetSize<User>(dbContext, $@"WHERE t.""Id"" = {user.Id}"));
                     Console.WriteLine($"userRowSize:{userRowSize}");
+
+                    var fileStoreRowSize = dbConnection.QuerySingle<int>(
+                        NpgsqlGetSize<FileStore>(dbContext, $@"WHERE t.""UserId"" = {user.Id}"));
                     Console.WriteLine($"fileStoreRowSize:{fileStoreRowSize}");
+
+                    var userNotificationRowSize = dbConnection.QuerySingle<int>(
+                        NpgsqlGetSize<UserNotification>(dbContext, $@"WHERE t.""UserId"" = {user.Id}"));
                     Console.WriteLine($"userNotificationRowSize:{userNotificationRowSize}");
 
 
-                    var userRowSize2 = dbContext.Users
-                        .Where(n => n.Id == user.Id)
-                        .Sum(n => SqlFuncHelper.ColumnDataSize(n.Id));
-                    var fileStoreRowSize2 = dbContext.FileStores
-                        .Where(n => n.UserId == user.Id)
-                        .Sum(n => SqlFuncHelper.ColumnDataSize(n.Id) +
-                        SqlFuncHelper.ColumnDataSize(n.UserId) +
-                        SqlFuncHelper.ColumnDataSize(n._data));
-                    var userNotificationRowSize2 = dbContext.UserNotifications
-                        .Where(n => n.UserId == user.Id)
-                        .Sum(n => SqlFuncHelper.ColumnDataSize(n.Id) +
-                        SqlFuncHelper.ColumnDataSize(n.UserId) +
-                        SqlFuncHelper.ColumnDataSize(n.Message));
+                    RunTestOfUserDefinedFunction(dbContext, user);
+                    RunTestOfUserDefinedFunctionWithCustomExpression(dbContext, user);
 
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine("User-defined function mapping");
-                    Console.ResetColor();
-
-                    Console.WriteLine($"userRowSize2:{userRowSize2}");
-                    Console.WriteLine($"fileStoreRowSize2:{fileStoreRowSize2}");
-                    Console.WriteLine($"userNotificationRowSize2:{userNotificationRowSize2}");
                 }
             }
             catch (Exception ex)
@@ -128,42 +112,27 @@ namespace SampleEfCoreDatabaseRowSizeConsole
                     var user = dbContext.Users.First();
 
                     var dbConnection = dbContext.Database.GetDbConnection();
-                    var userRowSize = dbConnection.QuerySingle<int>(
-                        MssqlGetSize<User>(dbContext, $"WHERE t.Id = {user.Id}"));
-                    var fileStoreRowSize = dbConnection.QuerySingle<int>(
-                        MssqlGetSize<FileStore>(dbContext, $"WHERE t.UserId = {user.Id}"));
-                    var userNotificationRowSize = dbConnection.QuerySingle<int>(
-                        MssqlGetSize<UserNotification>(dbContext, $"WHERE t.UserId = {user.Id}"));
+
 
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine("Custom Command");
                     Console.ResetColor();
 
+                    var userRowSize = dbConnection.QuerySingle<int>(
+                        MssqlGetSize<User>(dbContext, $"WHERE t.Id = {user.Id}"));
                     Console.WriteLine($"userRowSize:{userRowSize}");
+
+                    var fileStoreRowSize = dbConnection.QuerySingle<int>(
+                        MssqlGetSize<FileStore>(dbContext, $"WHERE t.UserId = {user.Id}"));
                     Console.WriteLine($"fileStoreRowSize:{fileStoreRowSize}");
+
+                    var userNotificationRowSize = dbConnection.QuerySingle<int>(
+                        MssqlGetSize<UserNotification>(dbContext, $"WHERE t.UserId = {user.Id}"));
                     Console.WriteLine($"userNotificationRowSize:{userNotificationRowSize}");
 
-                    var userRowSize2 = dbContext.Users
-                        .Where(n => n.Id == user.Id)
-                        .Sum(n => SqlFuncHelper.ColumnDataSize(n.Id));
-                    var fileStoreRowSize2 = dbContext.FileStores
-                        .Where(n => n.UserId == user.Id)
-                        .Sum(n => SqlFuncHelper.ColumnDataSize(n.Id) +
-                        SqlFuncHelper.ColumnDataSize(n.UserId) +
-                        SqlFuncHelper.ColumnDataSize(n._data));
-                    var userNotificationRowSize2 = dbContext.UserNotifications
-                        .Where(n => n.UserId == user.Id)
-                        .Sum(n => SqlFuncHelper.ColumnDataSize(n.Id) +
-                        SqlFuncHelper.ColumnDataSize(n.UserId) +
-                        SqlFuncHelper.ColumnDataSize(n.Message));
 
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine("User-defined function mapping");
-                    Console.ResetColor();
-
-                    Console.WriteLine($"userRowSize2:{userRowSize2}");
-                    Console.WriteLine($"fileStoreRowSize2:{fileStoreRowSize2}");
-                    Console.WriteLine($"userNotificationRowSize2:{userNotificationRowSize2}");
+                    RunTestOfUserDefinedFunction(dbContext, user);
+                    RunTestOfUserDefinedFunctionWithCustomExpression(dbContext, user);
 
                 }
             }
@@ -175,6 +144,55 @@ namespace SampleEfCoreDatabaseRowSizeConsole
                 Console.ResetColor();
             }
             Console.WriteLine();
+        }
+
+        private static void RunTestOfUserDefinedFunction(TestDbContext dbContext, User user)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("User-defined function");
+            Console.ResetColor();
+
+            var userRowSize2 = dbContext.Users
+                .Where(n => n.Id == user.Id)
+                .Sum(n => SqlFuncHelper.ColumnDataSize(n.Id));
+            Console.WriteLine($"userRowSize2:{userRowSize2}");
+
+            //var fileStoreRowSize2 = dbContext.FileStores
+            //    .Where(n => n.UserId == user.Id)
+            //    .Sum(n => SqlFuncHelper.ColumnDataSize(n.Id) +
+            //    SqlFuncHelper.ColumnDataSize(n.UserId) +
+            //    SqlFuncHelper.ColumnDataSize(n.Data));
+            //Console.WriteLine($"fileStoreRowSize2:{fileStoreRowSize2}");
+            Console.WriteLine($"fileStoreRowSize2:---");
+
+            var userNotificationRowSize2 = dbContext.UserNotifications
+                .Where(n => n.UserId == user.Id)
+                .Sum(n => SqlFuncHelper.ColumnDataSize(n.Id) +
+                SqlFuncHelper.ColumnDataSize(n.UserId) +
+                SqlFuncHelper.ColumnDataSize(n.Message));
+            Console.WriteLine($"userNotificationRowSize2:{userNotificationRowSize2}");
+        }
+
+        private static void RunTestOfUserDefinedFunctionWithCustomExpression(TestDbContext dbContext, User user)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("User-defined function with Custom Expression");
+            Console.ResetColor();
+
+            var userRowSize3 = dbContext.Users
+                .Where(n => n.Id == user.Id)
+                .GetCustomRowSize(dbContext);
+            Console.WriteLine($"userRowSize3:{userRowSize3}");
+
+            var fileStoreRowSize3 = dbContext.FileStores
+                .Where(n => n.UserId == user.Id)
+                .GetCustomRowSize(dbContext);
+            Console.WriteLine($"fileStoreRowSize3:{fileStoreRowSize3}");
+
+            var userNotificationRowSize3 = dbContext.UserNotifications
+                .Where(n => n.UserId == user.Id)
+                .GetCustomRowSize(dbContext);
+            Console.WriteLine($"userNotificationRowSize3:{userNotificationRowSize3}");
         }
 
         static string MssqlGetSize<T>(DbContext dbContext,
@@ -225,15 +243,17 @@ FROM {fullTableNameStr} AS {alias}
             dbContext.Users.Add(user);
             dbContext.SaveChanges();
 
-            var fileStore = new FileStore();
-            fileStore.UserId = user.Id;
-            fileStore._data = new byte[1024];
+            var fileStore = new FileStore(
+                user.Id,
+                new byte[1024]
+                );
             dbContext.Add(fileStore);
             dbContext.SaveChanges();
 
-            var userNotification = new UserNotification();
-            userNotification.UserId = user.Id;
-            userNotification.Message = string.Join("", Enumerable.Repeat("一二", 250));
+            var userNotification = new UserNotification(
+                user.Id,
+                string.Join("", Enumerable.Repeat("一二", 250))
+                );
             dbContext.Add(userNotification);
             dbContext.SaveChanges();
 

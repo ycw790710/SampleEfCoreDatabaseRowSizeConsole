@@ -2,9 +2,16 @@
 
 public class UserNotification
 {
-    public int Id { get; set; }
+    public int Id { get; }
 
-    public int UserId { get; set; }
+    public int UserId { get; private set; }
 
-    public string Message { get; set; }
+    public string Message { get; private set; }
+
+    public UserNotification(int userId, string message)
+    {
+        UserId = userId;
+        Message = message;
+    }
+
 }
