@@ -17,6 +17,10 @@ internal class NpgSqlFuncHelperTranslations : ISqlFuncHelperTranslations
             if (columnExpression == null)
                 columnExpression = (firstArg as SqlUnaryExpression)?.Operand as ColumnExpression;
             if (columnExpression == null)
+                columnExpression = (firstArg as SqlFunctionExpression)?.Arguments[1] as ColumnExpression;
+            if (columnExpression == null)
+                columnExpression = (firstArg as SqlBinaryExpression)?.Left as ColumnExpression;
+            if (columnExpression == null)
                 throw new Exception($"Unhandled arg type:{firstArg.GetType()}");
             var sqlArguments = new SqlExpression[] { columnExpression };
             var returnType = typeof(long);

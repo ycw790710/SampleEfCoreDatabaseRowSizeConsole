@@ -30,16 +30,44 @@ public static class CustomRowSizeExtensions
 
         foreach (var property in properties)
         {
-            if (!property.IsShadowProperty())
-            {
-                var pgColumnSizeExpression = Expression.Call(
-                    typeof(SqlFuncHelper),
-                    nameof(SqlFuncHelper.ColumnDataSize),
-                    null,
-                    Expression.Property(parameter, property.Name));
+            if (property.IsShadowProperty())
+                continue;
 
-                sumExpressions.Add(pgColumnSizeExpression);
-            }
+            Expression columnDataSizeExpression = null;
+
+            // 改成都是塞入equal
+            var propertyExpression = Expression.Property(parameter, property.Name);
+            var equalExpression = Expression.Equal(propertyExpression, propertyExpression);
+
+            columnDataSizeExpression = Expression.Call(
+                typeof(SqlFuncHelper),
+                nameof(SqlFuncHelper.ColumnDataSize),
+                null,
+                equalExpression);
+
+            // 分情況, 但是可能會有更多複雜的情況
+            //if (property.ClrType.IsValueType || property.ClrType.IsArray ||
+            //    property.ClrType == typeof(string))
+            //{
+            //    columnDataSizeExpression = Expression.Call(
+            //        typeof(SqlFuncHelper),
+            //        nameof(SqlFuncHelper.ColumnDataSize),
+            //        null,
+            //        Expression.Property(parameter, property.Name));
+            //}
+            //else
+            //{
+            //    var enumProperty = Expression.Property(parameter, property.Name);
+            //    var enumEqualExpression = Expression.Equal(enumProperty, enumProperty);
+
+            //    columnDataSizeExpression = Expression.Call(
+            //        typeof(SqlFuncHelper),
+            //        nameof(SqlFuncHelper.ColumnDataSize),
+            //        null,
+            //        enumEqualExpression);
+            //}
+
+            sumExpressions.Add(columnDataSizeExpression);
         }
 
         var totalExpression = sumExpressions.Aggregate(

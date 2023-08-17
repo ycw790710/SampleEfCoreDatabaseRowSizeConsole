@@ -155,7 +155,7 @@ namespace SampleEfCoreDatabaseRowSizeConsole
 
             var userRowSize2 = dbContext.Users
                 .Where(n => n.Id == user.Id)
-                .Sum(n => SqlFuncHelper.ColumnDataSize(n.Id));
+                .Sum(n => SqlFuncHelper.ColumnDataSize(n.Id.ToString()));
             Console.WriteLine($"userRowSize2:{userRowSize2}");
 
             //var fileStoreRowSize2 = dbContext.FileStores
@@ -168,9 +168,10 @@ namespace SampleEfCoreDatabaseRowSizeConsole
 
             var userNotificationRowSize2 = dbContext.UserNotifications
                 .Where(n => n.UserId == user.Id)
-                .Sum(n => SqlFuncHelper.ColumnDataSize(n.Id) +
-                SqlFuncHelper.ColumnDataSize(n.UserId) +
-                SqlFuncHelper.ColumnDataSize(n.Message));
+                .Sum(n => SqlFuncHelper.ColumnDataSize(n.Id.ToString()) +
+                SqlFuncHelper.ColumnDataSize(n.UserId == n.UserId) +
+                SqlFuncHelper.ColumnDataSize(n.Message) +
+                SqlFuncHelper.ColumnDataSize(n.Type == n.Type));
             Console.WriteLine($"userNotificationRowSize2:{userNotificationRowSize2}");
         }
 
